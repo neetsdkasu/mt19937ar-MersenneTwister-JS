@@ -1,0 +1,63 @@
+<html>
+<head>
+<title>mt19937ar</title>
+<script type="text/javascript" language="javascript" src="mt19937ar.js"></script>
+
+</head>
+<body>
+<h1>mt9937ar - Mersenne Twister</h1>
+<hr>
+<script type="text/javascript" language="javascript"><!--
+
+function formatInt(n, val, sp) {
+    if (sp) {} else { sp = " "; }
+    var t = val.toString();
+    while (t.length < n) {
+        t = sp + t;
+    }
+    return t;
+}
+
+function formatDbl(n, m, val, sp) {
+    if (sp) {} else { sp = " "; }
+    var k = (val + Math.pow(10, -m) / 2.0).toString();
+    var t = k.split(".");
+    while (t[0].length < (n - m - 1)) {
+        t[0] = sp + t[0];
+    }
+    while (t[1].length < m) {
+        t[1] = t[1] + "0";
+    }
+    if (t[1].length > m) {
+        t[1] = t[1].substring(0, m);
+    }
+    return (t[0] + "." + t[1]).substring(0, n);
+}
+
+var mt = new MersenneTwister();
+
+var init = new Array(0x123, 0x234, 0x345, 0x456);
+var length = 4;
+mt.init_by_array(init, length);
+var text = "";
+
+text += "1000 outputs of genrand_int32()\n";
+for (i=0; i<1000; i++) {
+    text += formatInt(10, mt.genrand_int32()) + " ";
+    if ((i % 5) == 4) { text += "\n"; }
+}
+
+text += "\n1000 outputs of genrand_real2()\n";
+for (i=0; i<1000; i++) {
+    text += formatDbl(10, 8, mt.genrand_real2()) + " ";
+    if ((i % 5) == 4) { text += "\n"; }
+}
+
+document.open();
+document.writeln('<textarea rows="50" cols="100">' + text + "</textarea>");
+document.close();
+
+// --></script>
+<hr>
+</body>
+</html>
