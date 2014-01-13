@@ -14,6 +14,7 @@
 <div>出力確認用アウトプット(mt19937ar.out)</div>
 <script type="text/javascript" language="javascript"><!--
 
+// 数値(整数)文字列整形
 function formatInt(n, val, sp) {
     if (sp) {} else { sp = " "; }
     var t = val.toString();
@@ -23,9 +24,10 @@ function formatInt(n, val, sp) {
     return t;
 }
 
+// 数値(小数)文字列整形
 function formatDbl(n, m, val, sp) {
     if (sp) {} else { sp = " "; }
-    var k = (val + Math.pow(10, -m) / 2.0).toString();
+    var k = (val + Math.pow(10, -m - 1) * 5.0).toString();
     var t = k.split(".");
     while (t[0].length < (n - m - 1)) {
         t[0] = sp + t[0];
@@ -39,6 +41,8 @@ function formatDbl(n, m, val, sp) {
     return (t[0] + "." + t[1]).substring(0, n);
 }
 
+// 疑似乱数生成機のテスト
+
 var mt = new MersenneTwister();
 
 var init = new Array(0x123, 0x234, 0x345, 0x456);
@@ -49,13 +53,17 @@ var text = "";
 text += "1000 outputs of genrand_int32()\n";
 for (i=0; i<1000; i++) {
     text += formatInt(10, mt.genrand_int32()) + " ";
-    if ((i % 5) == 4) { text += "\n"; }
+    if ((i % 5) == 4) {
+        text += "\n";
+    }
 }
 
 text += "\n1000 outputs of genrand_real2()\n";
 for (i=0; i<1000; i++) {
     text += formatDbl(10, 8, mt.genrand_real2()) + " ";
-    if ((i % 5) == 4) { text += "\n"; }
+    if ((i % 5) == 4) {
+        text += "\n";
+    }
 }
 
 document.open();
