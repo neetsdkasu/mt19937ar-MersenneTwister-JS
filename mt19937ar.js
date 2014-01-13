@@ -53,156 +53,158 @@
 */
 // ======================================================================
 
-// 整数を扱うクラス
-function Int32(value) {
-    var bits = new Array(0, 0, 0, 0);
-    var i;
-    var v = value;
-    if (v != 0) {
-        for (i = 0; i < 4; ++i) {
-           bits[i] = v & 0xff;
-           v = v >> 8;
-        }
-    }
-    this.getValue = function () {
-        return (bits[0] | (bits[1] << 8) | (bits[2] << 16)) + ((bits[3] << 16) * 0x100);
-    };
-    this.getBits = function (i) { return bits[i & 3]; };
-    this.setBits = function (i, val) { return (bits[i & 3] = val & 0xff); };
-    this.add = function (another) {
-        var tmp = new Int32(0);
-        var i, fl = 0, b;
-        for (i = 0; i < 4; ++i) {
-            b = bits[i] + another.getBits(i) + fl;
-            tmp.setBits(i, b);
-            fl = b >> 8;
-        }
-        return tmp;
-    };
-    this.sub = function (another) {
-        var tmp = new Int32(0);
-        var bb = new Array(0, 0, 0, 0);
-        var i;
-        for (i = 0; i < 4; ++i) {
-            bb[i] = bits[i] - another.getBits(i);
-            if ((i > 0) && (bb[i - 1] < 0)) {
-                --bb[i];
-            }
-        }
-        for (i = 0; i < 4; ++i) {
-            tmp.setBits(i, bb[i]);
-        }
-        return tmp;
-    };
-    this.mul = function (another) {
-        var tmp = new Int32(0);
-        var bb = new Array(0, 0, 0, 0, 0);
-        var i, j;
-        for (i = 0; i < 4; ++i) {
-            for (j = 0; i + j < 4; ++j) {
-                bb[i + j] += bits[i] * another.getBits(j);
-            }
-            tmp.setBits(i, bb[i]);
-            bb[i + 1] += bb[i] >> 8;
-        }
-        return tmp;
-    };
-    this.and = function (another) {
-        var tmp = new Int32(0);
-        var i;
-        for (i = 0; i < 4; ++i) {
-            tmp.setBits(i, bits[i] & another.getBits(i));
-        }
-        return tmp;
-    };
-    this.or = function (another) {
-        var tmp = new Int32(0);
-        var i;
-        for (i = 0; i < 4; ++i) {
-            tmp.setBits(i, bits[i] | another.getBits(i));
-        }
-        return tmp;
-    };
-    this.xor = function (another) {
-        var tmp = new Int32(0);
-        var i;
-        for (i = 0; i < 4; ++i) {
-            tmp.setBits(i, bits[i] ^ another.getBits(i));
-        }
-        return tmp;
-    };
-    this.rshifta = function (s) {
-        var tmp = new Int32(0);
-        var bb = new Array(0, 0, 0, 0, 0);
-        var p = s >> 3;
-        var i, sg = 0;
-        if ((bits[3] & 0x80) > 0) {
-            bb[4] = sg = 0xff;
-        }
-        for (i = 0; i + p < 4; ++i) {
-            bb[i] = bits[i + p];
-        }
-        for (; i < 4; ++i) {
-            bb[i] = sg;
-        }
-        p = s & 0x7;
-        for (i = 0; i < 4; ++i) {
-            tmp.setBits(i, ((bb[i] | (bb[i + 1] << 8)) >> p) & 0xff);
-        }
-        return tmp;
-    };
-    this.rshiftl = function (s) {
-        var tmp = new Int32(0);
-        var bb = new Array(0, 0, 0, 0, 0);
-        var p = s >> 3;
-        var i;
-        for (i = 0; i + p < 4; ++i) {
-            bb[i] = bits[i + p];
-        }
-        p = s & 0x7;
-        for (i = 0; i < 4; ++i) {
-            tmp.setBits(i, ((bb[i] | (bb[i + 1] << 8)) >> p) & 0xff);
-        }
-        return tmp;
-    };
-    this.lshift = function (s) {
-        var tmp = new Int32(0);
-        var bb = new Array(0, 0, 0, 0, 0);
-        var p = s >> 3;
-        var i;
-        for (i = 0; i + p < 4; ++i) {
-            bb[i + p + 1] = bits[i];
-        }
-        p = s & 0x7;
-        for (i = 0; i < 4; ++i) {
-            tmp.setBits(i, (((bb[i] | (bb[i + 1] << 8)) << p) >> 8) & 0xff);
-        }
-        return tmp;
-    };
-    this.equals = function (another) {
-        var i;
-        for (i = 0; i < 4; ++i) {
-            if (bits[i] != another.getBits(i)) {
-                return false;
-            }
-        }
-        return true;
-    };
-    this.compare = function (another) {
-        var i;
-        for (i = 3; i >= 0; --i) {
-            if (bits[i] > another.getBits(i)) {
-                return 1;
-            } else if (bits[i] < another.getBits(i)) {
-                return -1;
-            }
-        }
-        return 0;
-    };
-}
-
-
 function  MersenneTwister() {
+
+    // 整数を扱うクラス
+    function Int32(value) {
+        var bits = new Array(0, 0, 0, 0);
+        var i;
+        var v = value;
+        if (v != 0) {
+            for (i = 0; i < 4; ++i) {
+               bits[i] = v & 0xff;
+               v = v >> 8;
+            }
+        }
+        this.getValue = function () {
+            return (bits[0] | (bits[1] << 8) | (bits[2] << 16)) + ((bits[3] << 16) * 0x100);
+        };
+        this.getBits = function (i) { return bits[i & 3]; };
+        this.setBits = function (i, val) { return (bits[i & 3] = val & 0xff); };
+        this.add = function (another) {
+            var tmp = new Int32(0);
+            var i, fl = 0, b;
+            for (i = 0; i < 4; ++i) {
+                b = bits[i] + another.getBits(i) + fl;
+                tmp.setBits(i, b);
+                fl = b >> 8;
+            }
+            return tmp;
+        };
+        this.sub = function (another) {
+            var tmp = new Int32(0);
+            var bb = new Array(0, 0, 0, 0);
+            var i;
+            for (i = 0; i < 4; ++i) {
+                bb[i] = bits[i] - another.getBits(i);
+                if ((i > 0) && (bb[i - 1] < 0)) {
+                    --bb[i];
+                }
+            }
+            for (i = 0; i < 4; ++i) {
+                tmp.setBits(i, bb[i]);
+            }
+            return tmp;
+        };
+        this.mul = function (another) {
+            var tmp = new Int32(0);
+            var bb = new Array(0, 0, 0, 0, 0);
+            var i, j;
+            for (i = 0; i < 4; ++i) {
+                for (j = 0; i + j < 4; ++j) {
+                    bb[i + j] += bits[i] * another.getBits(j);
+                }
+                tmp.setBits(i, bb[i]);
+                bb[i + 1] += bb[i] >> 8;
+            }
+            return tmp;
+        };
+        this.and = function (another) {
+            var tmp = new Int32(0);
+            var i;
+            for (i = 0; i < 4; ++i) {
+                tmp.setBits(i, bits[i] & another.getBits(i));
+            }
+            return tmp;
+        };
+        this.or = function (another) {
+            var tmp = new Int32(0);
+            var i;
+            for (i = 0; i < 4; ++i) {
+                tmp.setBits(i, bits[i] | another.getBits(i));
+            }
+            return tmp;
+        };
+        this.xor = function (another) {
+            var tmp = new Int32(0);
+            var i;
+            for (i = 0; i < 4; ++i) {
+                tmp.setBits(i, bits[i] ^ another.getBits(i));
+            }
+            return tmp;
+        };
+        this.rshifta = function (s) {
+            var tmp = new Int32(0);
+            var bb = new Array(0, 0, 0, 0, 0);
+            var p = s >> 3;
+            var i, sg = 0;
+            if ((bits[3] & 0x80) > 0) {
+                bb[4] = sg = 0xff;
+            }
+            for (i = 0; i + p < 4; ++i) {
+                bb[i] = bits[i + p];
+            }
+            for (; i < 4; ++i) {
+                bb[i] = sg;
+            }
+            p = s & 0x7;
+            for (i = 0; i < 4; ++i) {
+                tmp.setBits(i, ((bb[i] | (bb[i + 1] << 8)) >> p) & 0xff);
+            }
+            return tmp;
+        };
+        this.rshiftl = function (s) {
+            var tmp = new Int32(0);
+            var bb = new Array(0, 0, 0, 0, 0);
+            var p = s >> 3;
+            var i;
+            for (i = 0; i + p < 4; ++i) {
+                bb[i] = bits[i + p];
+            }
+            p = s & 0x7;
+            for (i = 0; i < 4; ++i) {
+                tmp.setBits(i, ((bb[i] | (bb[i + 1] << 8)) >> p) & 0xff);
+            }
+            return tmp;
+        };
+        this.lshift = function (s) {
+            var tmp = new Int32(0);
+            var bb = new Array(0, 0, 0, 0, 0);
+            var p = s >> 3;
+            var i;
+            for (i = 0; i + p < 4; ++i) {
+                bb[i + p + 1] = bits[i];
+            }
+            p = s & 0x7;
+            for (i = 0; i < 4; ++i) {
+                tmp.setBits(i, (((bb[i] | (bb[i + 1] << 8)) << p) >> 8) & 0xff);
+            }
+            return tmp;
+        };
+        this.equals = function (another) {
+            var i;
+            for (i = 0; i < 4; ++i) {
+                if (bits[i] != another.getBits(i)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+        this.compare = function (another) {
+            var i;
+            for (i = 3; i >= 0; --i) {
+                if (bits[i] > another.getBits(i)) {
+                    return 1;
+                } else if (bits[i] < another.getBits(i)) {
+                    return -1;
+                }
+            }
+            return 0;
+        };
+    }
+    // End of Int32
+    
+    
     /* Period parameters */
     var N = 624;
     var M = 397;
