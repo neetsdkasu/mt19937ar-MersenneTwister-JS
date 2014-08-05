@@ -1,11 +1,11 @@
 /*
- *  ‹^——”¶¬‹@  ˆÚA  
+ *  ç–‘ä¼¼ä¹±æ•°ç”Ÿæˆæ©Ÿ  ç§»æ¤  
  * 
  *  Mersenne Twister with improved initialization (2002)
  *  http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/mt.html
  *  http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/mt19937ar.html
  */
-// = ˆÚAŒ³ƒ‰ƒCƒ“ƒZƒ“ƒX =======================================================
+// = ç§»æ¤å…ƒãƒ©ã‚¤ãƒ³ã‚»ãƒ³ã‚¹ =======================================================
 // ======================================================================
 /* 
    A C-program for MT19937, with initialization improved 2002/2/10.
@@ -55,7 +55,7 @@
 
 function  MersenneTwister() {
 
-    // ®”‚ğˆµ‚¤ƒNƒ‰ƒX
+    // æ•´æ•°ã‚’æ‰±ã†ã‚¯ãƒ©ã‚¹
     function Int32(value) {
         var bits = new Array(0, 0, 0, 0);
         var i;
